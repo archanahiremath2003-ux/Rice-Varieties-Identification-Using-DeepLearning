@@ -1,0 +1,60 @@
+/* Green theme styling - modern rice-style dashboard */
+:root{
+  --green-1: #eafaf1;
+  --green-2: #c7f0d2;
+  --green-3: #4caf50;
+  --accent: #2e7d32;
+}
+*{box-sizing:border-box;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+body.page-bg{
+  background: linear-gradient(135deg, var(--green-1), #f6fff7);
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.container.card{
+  background:rgba(255,255,255,0.95);
+  padding:28px;
+  width:900px;
+  max-width:96%;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(46,125,50,0.12);
+  text-align:center;
+}
+h2{color:var(--accent);margin-top:0;}
+h3{color:var(--green-3);margin-bottom:12px;}
+
+/* Forms */
+input[type="text"], input[type="email"], input[type="password"], select, input[type="file"]{
+  width:90%; padding:10px; margin:8px 0; border-radius:8px; border:1px solid #dfeee0;
+  background:#fbfff9;
+}
+.btn{
+  width:92%; padding:12px; margin-top:12px; background:var(--green-3); color:white; border:none; border-radius:8px; cursor:pointer;
+  font-weight:600;
+}
+.btn:hover{background:var(--accent);}
+
+/* Links */
+.links{margin-top:14px;}
+a{color:var(--accent); text-decoration:none; margin:0 8px;}
+a:hover{text-decoration:underline;}
+
+/* Table styling */
+.table-wrap{overflow:auto; margin-top:18px; text-align:left;}
+.styled-table{border-collapse:collapse; width:100%;}
+.styled-table thead tr{background:linear-gradient(90deg,var(--green-3), #2e7d32); color:#fff; text-align:left;}
+.styled-table th, .styled-table td{padding:12px 15px; border-bottom:1px solid #e9f6ec;}
+.styled-table tbody tr{background:#ffffff;}
+.styled-table tbody tr:nth-of-type(even){background: #f6fff7;}
+.styled-table tbody tr:hover{background:#eafaf1;}
+.styled-table th{font-weight:700;}
+
+/* Responsive */
+@media(max-width:700px){
+  .container.card{padding:18px;}
+  input[type="text"], input[type="email"], input[type="password"], select, input[type="file"]{width:100%;}
+  .styled-table th, .styled-table td{padding:8px;}
+}

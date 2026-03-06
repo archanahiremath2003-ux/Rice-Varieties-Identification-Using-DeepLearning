@@ -1,0 +1,52 @@
+from flask import Flask, request, jsonify
+import tensorflow as tf
+import numpy as np
+import os
+from PIL import Image
+
+app = Flask(__name__)
+
+# Load Model
+MODEL_PATH = "../model/model.h5"
+model = tf.keras.models.load_model(MODEL_PATH)
+
+# Allowed classes (edit according to your dataset)
+CLASS_NAMES = ["Basmati", "Sona Masuri", "Ponni", "Brown Rice", "Jeera Samba"]
+
+UPLOAD_FOLDER = "static/uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def preprocess_image(img_path):
+    img = Image.open(img_path).resize((224, 224))
+    img = np.array(img) / 255.0
+    img = np.expand_dims(img, axis=0)
+    return img
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'file' not in request.files:
+        return jsonify({"error": "No image uploaded"}), 400
+    
+    file = request.files['file']
+    save_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(save_path)
+
+    # Preprocess and Predict
+    img = preprocess_image(save_path)
+    preds = model.predict(img)
+    class_index = np.argmax(preds)
+    confidence = float(np.max(preds))
+
+    result = {
+        "predicted_class": CLASS_NAMES[class_index],
+        "confidence": round(confidence, 4)
+    }
+
+    return jsonify(result)
+
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({"status": "API running", "endpoint": "/predict"})
+
+if __name__ == '__main__':
+    app.run(debug=True)

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Rice Varieties Prediction</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e8f5e9, #ffffff);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: #fff;
+            width: 420px;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        h2 {
+            color: #2e7d32;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #1b5e20;
+        }
+
+        h3 {
+            margin-top: 25px;
+            color: #333;
+        }
+
+        pre {
+            background: #f1f8e9;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: left;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        img {
+            margin-top: 15px;
+            border-radius: 10px;
+            max-width: 100%;
+            display: none;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2>Upload Rice Image & Choose Model</h2>
+
+    <input type="file" id="fileInput" accept="image/*">
+
+    <select id="modelSelect">
+        <option value="">-- Select Model --</option>
+        <option value="DenseNet121">DenseNet121</option>
+        <option value="MobileNet">MobileNet</option>
+    </select>
+
+    <button onclick="predictImage()">Predict</button>
+
+    <h3>Prediction Output:</h3>
+    <pre id="output">Waiting for prediction...</pre>
+
+    <h3>Image Preview:</h3>
+    <img id="preview" width="250">
+
+</div>
+
+<script>
+function predictImage() {
+    let file = document.getElementById("fileInput").files[0];
+    let model = document.getElementById("modelSelect").value;
+
+    if (!file) {
+        alert("Upload an image.");
+        return;
+    }
+    if (!model) {
+        alert("Select a model.");
+        return;
+    }
+
+    let form = new FormData();
+    form.append("file", file);
+    form.append("model_choice", model);
+
+    // Image preview
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let img = document.getElementById("preview");
+        img.src = e.target.result;
+        img.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+
+    fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        body: form
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("output").textContent =
+            JSON.stringify(data, null, 4);
+    })
+    .catch(err => {
+        document.getElementById("output").textContent =
+            "Error: " + err;
+    });
+}
+</script>
+
+</body>
+</html>

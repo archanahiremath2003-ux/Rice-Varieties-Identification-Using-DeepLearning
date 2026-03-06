@@ -1,0 +1,19 @@
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import json
+
+TRAIN_DIR = r"C:\path\to\your\training_dataset"  # update this
+
+datagen = ImageDataGenerator()
+gen = datagen.flow_from_directory(
+    TRAIN_DIR,
+    target_size=(224,224),
+    batch_size=1,
+    shuffle=False
+)
+
+print(gen.class_indices)
+
+with open("class_indices.json", "w") as f:
+    json.dump(gen.class_indices, f)
+
+print("class_indices.json saved!")

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rice Varieties Prediction</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background: linear-gradient(135deg,#e8f5e9,#ffffff);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    width:100%;
+    max-width:460px;
+}
+
+.card{
+    background:#fff;
+    padding:32px;
+    border-radius:18px;
+    box-shadow:0 14px 30px rgba(0,0,0,0.15);
+    text-align:center;
+}
+
+h2{
+    color:#2e7d32;
+    margin-bottom:25px;
+    font-size:24px;
+}
+
+input[type="file"],
+select{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    margin-bottom:15px;
+    font-size:15px;
+}
+
+button{
+    width:100%;
+    padding:13px;
+    background:#2e7d32;
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#1b5e20;
+}
+
+.section-title{
+    margin-top:25px;
+    color:#333;
+    font-size:17px;
+}
+
+.result-box{
+    background:#f1f8e9;
+    border-left:5px solid #2e7d32;
+    padding:14px;
+    border-radius:10px;
+    font-size:15px;
+    text-align:left;
+    margin-top:10px;
+}
+
+img{
+    margin-top:15px;
+    width:240px;
+    max-width:100%;
+    border-radius:12px;
+    border:1px solid #ccc;
+    display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+    <h2>Upload Rice Image & Choose Model</h2>
+
+    <input type="file" id="fileInput" accept="image/*">
+
+    <select id="modelSelect">
+        <option value="">-- Select Model --</option>
+        <option value="DenseNet121">DenseNet121</option>
+        <option value="MobileNet">MobileNet</option>
+    </select>
+
+    <button onclick="predictImage()">Predict</button>
+
+    <div class="section-title">Prediction Output:</div>
+    <div id="output" class="result-box">Waiting for prediction...</div>
+
+    <div class="section-title">Image Preview:</div>
+    <img id="preview">
+
+</div>
+</div>
+
+<script>
+function predictImage() {
+    let file = document.getElementById("fileInput").files[0];
+    let model = document.getElementById("modelSelect").value;
+
+    if (!file) {
+        alert("Please upload a rice image");
+        return;
+    }
+    if (!model) {
+        alert("Please select a model");
+        return;
+    }
+
+    let form = new FormData();
+    form.append("file", file);
+    form.append("model_choice", model);
+
+    // Image preview
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let img = document.getElementById("preview");
+        img.src = e.target.result;
+        img.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+
+    fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        body: form
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            document.getElementById("output").innerHTML =
+                "<span style='color:red'>Error: " + data.error + "</span>";
+            return;
+        }
+
+        document.getElementById("output").innerHTML = `
+            <b>Prediction:</b> ${data.prediction}<br>
+            <b>Confidence:</b> ${(data.confidence * 100).toFixed(2)}%<br>
+            <b>Model Used:</b> ${data.model_used}
+        `;
+    })
+    .catch(err => {
+        document.getElementById("output").innerHTML =
+            "<span style='color:red'>Failed to fetch prediction</span>";
+    });
+}
+</script>
+
+</body>
+</html>
